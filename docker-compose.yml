@@ -1,46 +1,40 @@
-version: "3"
+version: "3.8"
 
 services:
   app:
-    image: node:latest
-    command: "npm start"
+    build:
+      dockerfile: Dockerfile-app
+      context: ./
     restart: unless-stopped
-    working_dir: /app
     depends_on:
       - mail
       - db
     environment:
-      - NODE_ENV=production
-      - NODE_CONFIG_ENV=docker
-    volumes:
-      - .:/app:Z
+      NODE_ENV: production
+      NODE_CONFIG_ENV: docker
     ports:
-      - "80:80"
+      - 80:80
 
   mail:
-    image: node:latest
-    command: "npm run mail-server"
+    build:
+      dockerfile: Dockerfile-mail
+      context: ./
     restart: unless-stopped
-    working_dir: /app
     depends_on:
       - db
     environment:
-      - NODE_ENV=production
-      - NODE_CONFIG_ENV=docker
-    volumes:
-      - .:/app:Z
-    expose:
-      - 25
+      NODE_ENV: production
+      NODE_CONFIG_ENV: docker
     ports:
-      - "25:25"
+      - 25:25
 
   db:
-    image: rethinkdb:latest
+    build:
+      dockerfile: Dockerfile-db
+      context: ./
     restart: unless-stopped
     volumes:
-      - ./db:/data:Z
-    expose:
-      - 28015
+      - ./db:/data
     ports:
-      - "8080:8080"
-      - "28015:28015"
+      - 8080:8080
+      - 28015:28015
